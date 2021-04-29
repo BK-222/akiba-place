@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Akihabara Place</title>
+	<link rel="stylesheet" href="AppVue.css">
+	<script src="../../random/dev-client/vue.js"></script>
+</head>
+<body>
+	<div id="app">
+		<nav-comp :pages="pages" @changePage="changePage($event)"></nav-comp>
+		<section v-if="pages.main" class="main">
+			<h1 class="main__header">Welcome to the Akihabara place!</h1>
+			<h4 class="main__sub-header">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea consequatur rerum eligendi id, totam ex, laboriosam laborum reiciendis alias autem!</h4>
+			<div class="cover-image">
+				<div class="cover-image__text-button">
+					<div class="cover-image__text">"Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus laborum quod, ipsum illum accusantium at quos.<br>
+					Voluptatum vitae amet atque, possimus excepturi ea reiciendis soluta sunt perferendis."</div>
+					<button @click="changePage(2)" class="cover-image__button button--cta">Book now!</button>	
+				</div>
+			</div>
+			<h4>post a note</h4>
+			<input type="text" v-model="note">
+			<button @click="postNote">post</button>
+		</section>
+		<section v-if="pages.location">
+			<loc-comp></loc-comp>
+		</section>
+		<section v-if="pages.booking">
+			<book-comp></book-comp>
+		</section>
+		<section>
+			<keep-alive>
+				<component v-if="pages.members" :is="membersComp">
+				</component>
+			</keep-alive>
+		</section>
+	</div>
+</body>
+</html>
+
+<script src="components/nav.js"></script>
+<script src="components/location.js"></script>
+<script src="components/booking.js"></script>
+<script src="components/members.js"></script>
+<script>
+	new Vue({
+		el: '#app',
+		data: function() {
+			return {
+				membersComp: 'membersComp',
+				test: 'Main page',
+				forMain: '',
+				pages: {
+					main: true,
+					location: false,
+					booking: false,
+					members: false
+				},
+				note: '',
+				mainForm: {
+					msg: ''
+				}
+			}
+		},
+		methods: {
+			getMain: async function() {
+				try {
+					const response = await this.httpReq('GET', 'http://localhost:3000/main');
+					this.forMain = response;
+				}
+				catch(error) {
+					console.log(error);
+				}
+			},
+			postNote: async function() {
+				try {
+					const response = await this.httpReq('POST', 'http://localhost:3000/main', {
+						msg: this.note
+					});
+					console.log(response);
+				}
+				catch(error) {
+					console.log(error);
+				}
+			},
+			httpReq: async function(method, url, data) {
+				const response = await fetch(url, {
+					method: method,
+					body: JSON.stringify(data),
+					headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer' }
+				});
+				if (response.status >= 400) {
+					const errResData = await response.json();
+					const error = new Error(errResData.message);
+					throw error;
+				}
+				return response.json();
+			},
+			changePage: function(page) {
+				if (page === 0) {
+					this.pages.location = false;
+					this.pages.booking = false;
+					this.pages.members = false;
+					return this.pages.main = true;
+				}
+				if (page === 1) {
+					this.pages.main = false;
+					this.pages.booking = false;
+					this.pages.members = false;
+					return this.pages.location = true;
+				}
+				if (page === 2) {
+					this.pages.main = false;
+					this.pages.location = false;
+					this.pages.members = false;
+					return this.pages.booking = true;
+				}
+				if (page === 3) {
+					this.pages.main = false;
+					this.pages.location = false;
+					this.pages.booking = false;
+					return this.pages.members = true;
+				}
+			}
+		},
+		components: {
+			'navComp': navbar,
+			'locComp': ourLocation,
+			'bookComp': booking,
+			'membersComp': members
+		}
+	});
+</script>
