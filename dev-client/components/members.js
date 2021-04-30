@@ -10,6 +10,7 @@ const members = {
 					<label>Last Name: </label><input type="text" placeholder="Doe" v-model="form.last">\
 					<label>email: </label><input type="email" placeholder="ex. 3" min="0" v-model="form.email">\
 					<label>password: </label><input type="password" placeholder="******" v-model="form.password">\
+					<label>repeat password: </label><input type="password" placeholder="******" v-model="form.repeat">\
 					<button class="members-form__button" @click="signUpForm">Submit</button>\
 				</form>\
 				<h3>Already a member? Click below!</h3><div class="navbar__li button--cta" @click="alreadyMember = true, newMember = false">Members</div>\
@@ -67,7 +68,8 @@ const members = {
 				name: 'Sally',
 				last: 'Stedchen',
 				email: 'eva@mail.jp',
-				password: 'bakarosa'
+				password: 'bakarosa',
+				repeat: 'bakarosa'
 			},
 			newMember: true,
 			alreadyMember: false,
@@ -151,6 +153,7 @@ const members = {
 			const last = this.form.last;
 			const email = this.form.email;
 			const password = this.form.password;
+			const repeat = this.form.repeat;
 
 			if (name < 2) {
 				return alert('First name should be at least 2 characters long.');
@@ -163,6 +166,9 @@ const members = {
 			}
 			if (password < 5) {
 				return alert('A password has to be a minimum of 5 characters long.');
+			}
+			if (password !== repeat) {
+				return alert('Passwords have to match!');
 			}
 			try {
 				const response = await this.httpReq('POST', 'http://localhost:3000/main/members/signup', {
