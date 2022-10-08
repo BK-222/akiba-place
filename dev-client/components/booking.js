@@ -24,8 +24,8 @@ const booking = {
 	data: function() {
 		return {
 			form: {
-				name: 'Joe',
-				last: 'Biden',
+				name: 'Hiroshi',
+				last: 'Kurokawa',
 				days: null,
 				date: 'lately'
 			},
